@@ -227,6 +227,7 @@ else
     else
         echo "this is so dumb, why am i so bad at bash, someone fix this mess PLEASE"
     fi
+    read g
     rootpart=$(cat tempdisk.txt)
     mkfs.ext4 $rootpart
     clear
