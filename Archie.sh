@@ -17,7 +17,7 @@ else
     echo "-------------------------------------------------------------------"
     echo "Internet connection failed, please connect to the internet and rerun the script!"
     read -p "Press any ENTER to exit..." zzz
-    sl
+    if
 fi
 
 #Disclaimer
