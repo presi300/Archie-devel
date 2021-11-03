@@ -229,7 +229,7 @@ else
         echo "this is so dumb, why am i so bad at bash, someone fix this mess PLEASE"
         read x
     fi
-    rootpart=$(cat tempdisk2.txt)
+    rootpart=$(cat tempdisk.txt)
     read g
     mkfs.ext4 $rootpart
     clear
