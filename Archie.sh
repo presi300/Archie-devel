@@ -224,7 +224,7 @@ else
     partnum=$(grep -c '/dev/' tempdisk.txt)
     if [ $partnum -eq 2 ]; then
         sed -i '1d' tempdisk.txt
-        sed -i '1d' tempdisk.txt #Yes i need to do it twice, don't bully me
+        sed -i '2d' tempdisk.txt #Yes i need to do it twice, don't bully me
     else
         echo "this is so dumb, why am i so bad at bash, someone fix this mess PLEASE"
         read x
