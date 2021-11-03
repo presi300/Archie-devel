@@ -226,6 +226,7 @@ else
         sed -i '1d' ./tempdisk.txt
     else
         echo "this is so dumb, why am i so bad at bash, someone fix this mess PLEASE"
+        read x
     fi
     read g
     rootpart=$(cat tempdisk.txt)
