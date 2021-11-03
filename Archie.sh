@@ -223,7 +223,7 @@ else
     fdisk -l $dsk | grep 'G' | cut -d' ' -f1 | tee -a tempdisk.txt
     partnum=$(grep -c '/dev/' tempdisk.txt)
     if [ $partnum -eq 2 ]; then
-        sed -i '1d' tempdisk.txt
+        sed -i.bak '1d' tempdisk.txt
     else
         echo "this is so dumb, why am i so bad at bash, someone fix this mess PLEASE"
         read x
