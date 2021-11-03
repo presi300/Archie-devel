@@ -220,7 +220,7 @@ else
     efipart=$(fdisk -l $dsk | grep '300M' | cut -d' ' -f1)
     mkfs.fat -F32 $efipart
     touch tempdisk.txt
-    fdisk -l $dsk | grep 'G' | cut -d' ' -f1 | tee -tempdisk.txt
+    fdisk -l $dsk | grep 'G' | cut -d' ' -f1 | tee -a tempdisk.txt
     partnum=$(grep -c '/dev/' tempdisk.txt)
     if [ $partnum -eq 2 ]; then
         touch tempdisk2.txt
