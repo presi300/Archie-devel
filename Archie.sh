@@ -84,7 +84,7 @@ if [ $efi -eq 1 ]; then
         touch sfdisk.txt
         echo "label: GPT" >> sfdisk.txt
         echo ",300M, U"  >> sfdisk.txt
-        read "Do you want a swap partition [y/n]? " swp
+        read -p "Do you want a swap partition [y/n]? " swp
         if [ $swp = "y" ]; then
             echo ",4G, S" >> sfdisk.txt
         elif [ $swp = "n" ]; then
