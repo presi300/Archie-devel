@@ -118,7 +118,7 @@ elif [ $efi -eq 2 ]; then #BIOS
     read -p "Press ENTER to continue setting up disks..." xd
     touch sfdisk.txt
     echo "label: DOS" >> sfdisk.txt
-    read "Do you want a swap partition [y/n]? " swp
+    read -p "Do you want a swap partition [y/n]? " swp
     if [ $swp = "y" ]; then #Yes Swap
         echo ",4G, S" >> sfdisk.txt
     elif [ $swp = "n" ]; then #No Swap
