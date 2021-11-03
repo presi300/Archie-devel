@@ -13,7 +13,6 @@ if ping google.com -c 3 | grep -q 'ping: goole.com: Name or service not known'; 
   echo "Internet connection failed, please connect to the internet and rerun the script."
   read -p "Press any key to exit" zz
   exit
-else
 then
     echo "Intetnet connection succeeded."
     read -p "Press any key to continue" zzz
