@@ -5,6 +5,7 @@ if [ $? -eq 0 ]; then
 else
     echo "The script is required to be in the /root directory to work!"
     echo "Exitting..."
+fi
 
 clear
 echo "Welcome to Archie! A simple terminal based installer for Arch linux"
