@@ -1,6 +1,0 @@
-## ArchieP2
-2nd part of the archie instalation script...
-** **
-This part of the script is cloned and started automatically by the Archie script.
-It also does most of the actual setup.
-And no i couldn't figure out a better way to chroot... 
