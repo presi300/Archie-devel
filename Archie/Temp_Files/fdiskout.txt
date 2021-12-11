@@ -1,1 +1,0 @@
-Disk /dev/sda: 1.82 TiB, 2000398934016 bytes, 3907029168 sectors
