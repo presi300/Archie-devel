@@ -34,8 +34,9 @@ function continent {
         sudo pacman -S sdofhsdofiho #A GENIUS way to make it error out :)
     esac
 }
+echo "Let's configure the timezone//"
 
-read -p "Do you need help assistance up a timezone? [Y/n] " tmz
+read -p "Do you need assistance with setting up the timezone? [y/N] " tmz
 if [ $tmz = y ]; then
 
     continent    
@@ -84,3 +85,4 @@ else
     read -p "Enter your Continent/City (1st letter NEEDS to be capital): " $taim && echo $taim > /Archie/Temp_Files/timezone.txt
     timedatectl set-timezone 
     done
+fi
