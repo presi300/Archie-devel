@@ -49,5 +49,6 @@ bash Subscripts/Auto/Disk_Auto.sh
 
 #This is After the Disk BS finishes
 clear
+bash Subscripts/Auto/"Timezone and language"/Country.sh
 
 
