@@ -34,9 +34,10 @@ function continent {
         sudo pacman -S sdofhsdofiho #A GENIUS way to make it error out :)
     esac
 }
-echo "Let's configure the timezone//"
+echo "Let's configure the timezone"
 
 read -p "Do you need assistance with setting up the timezone? [y/N] " tmz
+touch timezone.txt
 if [ $tmz = y ]; then
 
     continent    
