@@ -46,3 +46,8 @@ cat Temp_Files/fdiskout.txt
 echo ""
 read -p "Press ENTER to continue"
 bash Subscripts/Auto/Disk_Auto.sh
+
+#This is After the Disk BS finishes
+clear
+
+
