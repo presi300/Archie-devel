@@ -10,8 +10,7 @@ fi
 clear
 echo "Welcome to Archie! A simple terminal based installer for Arch linux"
 echo "-------------------------------------------------------------------"
-echo "Make sure you have a network connection before proceeding with the install"
-echo "Press enter to begin"
+echo "Press ENTER to begin..."
 read pressenter
 clear
 echo "Chose instalation type:"
@@ -27,3 +26,4 @@ elif [ $mode -eq 2 ]; then
 elif [ $mode -eq 3 ]; then
     bash Subscripts/Manual/Manual.sh
 fi
+
