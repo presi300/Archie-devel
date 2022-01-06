@@ -77,12 +77,12 @@ if [ $tmz = y ]; then
 
 else
     clear
-    read -p "Enter your Continent/City (1st letter NEEDS to be capital): " $taim && echo $taim > /Archie/Temp_Files/timezone.txt
-    timedatectl set-timezone 
+    read -p "Enter your Continent/City (1st letter NEEDS to be capital): " $taim && echo $taim > timezone.txt
+    timedatectl set-timezone $taim
 
     while [ $? -ne 0 ]; do
     echo "Error unrecognised, please try again..."
-    read -p "Enter your Continent/City (1st letter NEEDS to be capital): " $taim && echo $taim > /Archie/Temp_Files/timezone.txt
-    timedatectl set-timezone 
+    read -p "Enter your Continent/City (1st letter NEEDS to be capital): " $taim && echo $taim > timezone.txt
+    timedatectl set-timezone $taim
     done
 fi
