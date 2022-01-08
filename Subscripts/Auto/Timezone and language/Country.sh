@@ -4,10 +4,10 @@ function spacer {
 echo "-------------------------------------------------------------------"
 }
 function continent {
-    cat Continents.txt
+    cat /Subscripts/Auto/"Timezone and language"/Continents.txt
     echo ""
     spacer
-    touch selectedcont.txt
+    touch /Subscripts/Auto/"Timezone and language"/selectedcont.txt
     read -p "Enter the number, shown next to your desired continent: " cont 
 
     case $cont in
@@ -37,7 +37,7 @@ function continent {
 echo "Let's configure the timezone"
 
 read -p "Do you need assistance with setting up the timezone? [y/N] " tmz
-touch timezone.txt
+touch /Subscripts/Auto/"Timezone and language"/timezone.txt
 if [ $tmz = y ]; then
 
     continent    
@@ -78,12 +78,12 @@ if [ $tmz = y ]; then
 
 else
     clear
-    read -p "Enter your Continent/City (1st letter NEEDS to be capital): " $taim && echo $taim > timezone.txt
+    read -p "Enter your Continent/City (1st letter NEEDS to be capital): " $taim && echo $taim > /Subscripts/Auto/"Timezone and language"/timezone.txt
     timedatectl set-timezone $taim
 
     while [ $? -ne 0 ]; do
     echo "Error unrecognised, please try again..."
-    read -p "Enter your Continent/City (1st letter NEEDS to be capital): " $taim && echo $taim > timezone.txt
+    read -p "Enter your Continent/City (1st letter NEEDS to be capital): " $taim && echo $taim > /Subscripts/Auto/"Timezone and language"/timezone.txt
     timedatectl set-timezone $taim
     done
 fi
