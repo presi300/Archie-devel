@@ -81,6 +81,8 @@ if [ $part == 1 ]; then #Automatic partitioning
         dialog --title "WARNING" --yesno "Selecting YES here WILL DELETE ALL THE DATA on the selected disk (/dev/$seldisk/)" 10 85
         if1exit
         wipefs -a /dev/$seldisk
+        dialog --title "Archie installer" --msgbox "You have chosen to Atomatically partition the disks.\n\nHint: The installer has detected that you are on an UEFI system, meaning that at least 2 partitions will have to be created a Root (/) and an EFI (/boot/efi) partition.n\nPress ENTER to start configuring the selected disk (/dev/$seldisk/)"   15 80
+
 
     fi
     if [ $efi == 0 ]; then #If BIOS
