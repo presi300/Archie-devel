@@ -67,18 +67,27 @@ echo "Selected disk is $seldisk" >> instalLog.log
 dialog --no-cancel --title "Archie installer" --menu "Selected disk is: /dev/$seldisk/\n How do you wanna partition the disk?" 15 55 5 \ 1 "Automatic partitioning" \ 2 "Manual partitioning" 2> part.txt
 part=$(cat part.txt)
 
-if [ $part == 1 ]; then
-    echo "mqn"
+if [ $part == 1 ]; then #Automatic partitioning
+    if [ $efi == 1 ]; then #If EFI
+        dialog --title "WARNING" --yesno "Selecting YES here WILL DELETE ALL THE DATA on the selected disk (/dev/$seldisk/)" 10 85
+        wipefs -a /dev/$seldisk
+
+    fi
+    if [ $efi == 0 ]; then #If BIOS
+        echo "hhhhh"
+    fi
+
 fi
 if [ $part == 2 ]; then #Manual partitioning
         dialog --title "WARNING" --yesno "Selecting YES here WILL DELETE ALL THE DATA on the selected disk (/dev/$seldisk/)" 10 85
-        #Add a wipefs command here
-    if [ $efi == 1 ]; then #If UEFI
         if [ $? == 1 ]; then #If NO is selected on the delete all data prompt
             clear
             echo "Aborting..."
             exit 1
         fi
+        wipefs -a /dev/$seldisk
+    if [ $efi == 1 ]; then #If UEFI
+        
         dialog --title "Archie installer" --msgbox "You have chosen to manually partition the disks.\n\nHint: The installer has detected that you are on an UEFI system, meaning that you need to choose the GPT partition scheme and create at least 2 partitions (a root and an efi one) for the system to function properly\n\nPress ENTER to start configuring the selected disk (/dev/$seldisk/)"   15 80
         cfdisk /dev/$seldisk
         dsp=$(fdisk -l /dev/$seldisk | grep "/dev")
@@ -137,11 +146,18 @@ if [ $part == 2 ]; then #Manual partitioning
             mkfs.ext4 "`cat homepart.txt`"  && mount "`cat homepart.txt`" /mnt/home
         fi
 
+        #Continue to write shit from here
+
 
 
     fi
     if [ $efi == 0 ]; then #If BIOS
         dialog --title "Archie installer" --msgbox "You have chosen to manually partition the disks.\n\nPress ENTER to start configuring the selected disk (/dev/$seldisk/)"   15 80
+        if [ $? == 1 ]; then
+            clear
+            echo "Aborting..."
+            exit 1
+        fi
         cfdisk /dev/$seldisk
         dsp=$(fdisk -l /dev/$seldisk | grep "/dev")
         parts1(){ #check root
@@ -171,6 +187,8 @@ if [ $part == 2 ]; then #Manual partitioning
         if [ "`cat swappart.txt`" != "skip" ]; then #check if swap is skipped
             mkswap "`cat swappart.txt`" &&  swapon "`cat swappart.txt`"
         fi
+        #Continue to write shit from here
+
         
     fi
 fi
