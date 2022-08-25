@@ -83,11 +83,11 @@ if [ $part == 1 ]; then #Automatic partitioning
         wipefs -a /dev/$seldisk
         dialog --title "Archie installer" --msgbox "You have chosen to Atomatically partition the disks.\n\nHint: The installer has detected that you are on an UEFI system, meaning that at least 2 partitions will have to be created a Root (/) and an EFI (/boot/efi) partition.n\nPress ENTER to start configuring the selected disk (/dev/$seldisk/)"   15 80
         touch autodisk.txt
-        dialog --title "Archie installer" --yesno "Is a swap partition needed?" 10 30
+        dialog --title "Archie installer" --yesno "Is a swap partition needed?" 5 45
         if [ $? == 0 ]; then
             echo "Swap = yes" >> autodisk.txt
             dialog --title "Archie installer" --inputbox "How much swap is needed?\n\nEnter it as <size>G with no space, where G stands for gigabytes of swap\n e.g: for 3GB of swap, enter 3G" 30 50 \n\nRecommended ammount of swap: Ram / 2\n\nWARNING: If too much swap is entered or it's entered incorrectly, the installer won't make any swap partitions 30 80 2> swapsize.txt
-            echo "Swapsize = `cat swapsize`" >> autodisk.txt 
+            echo "Swapsize = `cat swapsize.txt`" >> autodisk.txt 
 
         fi
 
