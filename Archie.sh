@@ -85,7 +85,7 @@ if [ $part == 1 ]; then #Automatic partitioning
         touch autodisk.txt
         dialog --title "Archie installer" --yesno "Is a swap partition needed?" 5 45
         echo $?
-        if [ $? == 0 ]; then
+        if [ $? -eq 0 ]; then
             echo "Swap = yes" >> autodisk.txt
             dialog --title "Archie installer" --inputbox "How much swap is needed?\n\nEnter it as <size>G with no space, where G stands for gigabytes of swap\n e.g: for 3GB of swap, enter 3G" 30 50 \n\nRecommended ammount of swap: Ram / 2\n\nWARNING: If too much swap is entered or it's entered incorrectly, the installer won't make any swap partitions 30 80 2> swapsize.txt
             echo "Swapsize = `cat swapsize.txt`" >> autodisk.txt 
