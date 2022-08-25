@@ -67,9 +67,19 @@ echo "Selected disk is $seldisk" >> instalLog.log
 dialog --no-cancel --title "Archie installer" --menu "Selected disk is: /dev/$seldisk/\n How do you wanna partition the disk?" 15 55 5 \ 1 "Automatic partitioning" \ 2 "Manual partitioning" 2> part.txt
 part=$(cat part.txt)
 
+#Begin partitioning BS
+if1exit(){
+    if [ $? == 1 ]; then #If NO is selected on the delete all data prompt   
+        clear
+        echo "Aborting..."
+        exit 1
+    fi
+}
+
 if [ $part == 1 ]; then #Automatic partitioning
     if [ $efi == 1 ]; then #If EFI
         dialog --title "WARNING" --yesno "Selecting YES here WILL DELETE ALL THE DATA on the selected disk (/dev/$seldisk/)" 10 85
+        if1exit
         wipefs -a /dev/$seldisk
 
     fi
@@ -80,11 +90,7 @@ if [ $part == 1 ]; then #Automatic partitioning
 fi
 if [ $part == 2 ]; then #Manual partitioning
         dialog --title "WARNING" --yesno "Selecting YES here WILL DELETE ALL THE DATA on the selected disk (/dev/$seldisk/)" 10 85
-        if [ $? == 1 ]; then #If NO is selected on the delete all data prompt
-            clear
-            echo "Aborting..."
-            exit 1
-        fi
+        if1exit
         wipefs -a /dev/$seldisk
     if [ $efi == 1 ]; then #If UEFI
         
@@ -153,11 +159,7 @@ if [ $part == 2 ]; then #Manual partitioning
     fi
     if [ $efi == 0 ]; then #If BIOS
         dialog --title "Archie installer" --msgbox "You have chosen to manually partition the disks.\n\nPress ENTER to start configuring the selected disk (/dev/$seldisk/)"   15 80
-        if [ $? == 1 ]; then
-            clear
-            echo "Aborting..."
-            exit 1
-        fi
+        if1exit
         cfdisk /dev/$seldisk
         dsp=$(fdisk -l /dev/$seldisk | grep "/dev")
         parts1(){ #check root
