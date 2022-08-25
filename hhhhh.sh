@@ -129,7 +129,7 @@ if [ $part == 2 ]; then #Manual partitioning
         #Partition creation
         dialog --title "Archie installer" --msgbox "Partitions that will be created:\n\nRoot (/): `cat rootpart.txt`\nEFI:`cat efipart.txt`\nSwap:`cat swappart.txt`\nHome:`cat swappart.txt`" 10 50
 
-        mkfs.ext4 "`cat rootpart.txt`" && mkfs.fat -F32 "`cat efipart.txt`" && mount "`cat rootpart.txt`" /mnt && mkdir /mnt/boot/efi && mount "`cat efipart.txt`" /mnt/boot/efi
+        mkfs.ext4 "`cat rootpart.txt`" && mkfs.fat -F32 "`cat efipart.txt`" && mount "`cat rootpart.txt`" /mnt && mkdir -p /mnt/boot/efi && mount "`cat efipart.txt`" /mnt/boot/efi
         if [ "`cat swappart.txt`" != "skip" ]; then
             mkswap "`cat swappart.txt`" &&  swapon "`cat swappart.txt`"
         fi
