@@ -1,4 +1,0 @@
-sda       1.8T
-sdb     931.5G
-zram0       5G
-nvme0n1 465.8G
