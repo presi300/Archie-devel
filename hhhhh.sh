@@ -128,14 +128,14 @@ if [ $part == 2 ]; then #Manual partitioning
         done
         #Partition creation
         dialog --title "Archie installer" --msgbox "Partitions that will be created:\n\nRoot (/): `cat rootpart.txt`\nEFI:`cat efipart.txt`\nSwap:`cat swappart.txt`\nHome:`cat swappart.txt`" 10 50
-        count=0
-        total=8
 
-        mkfs.ext4 "`cat rootpart.txt`" && mkfs.fat -F32 "`cat efipart.txt`" && mkswap "`cat swappart.txt`" && mkfs.ext4 "`cat homepart.txt`" && mount "`cat rootpart.txt`" /mnt && mkdir /mnt/boot/efi && swapon "`cat swappart.txt`" && mount "`cat homepart.txt`" | while read f;
-        do
-        count=$((count+1))
-        echo $(( 100*$count/$total ))
-        done|dialog --title "Logging All Files" --gauge "Please wait ...." 10 60 0
+        mkfs.ext4 "`cat rootpart.txt`" && mkfs.fat -F32 "`cat efipart.txt`" && mount "`cat rootpart.txt`" /mnt && mkdir /mnt/boot/efi && mount "`cat efipart.txt`" /mnt/boot/efi
+        if [ "`cat swappart.txt`" != "skip" ]; then
+            mkswap "`cat swappart.txt`" &&  swapon "`cat swappart.txt`"
+        fi
+        if [ "`cat homepart.txt`" != skip ]; then
+            mkfs.ext4 "`cat homepart.txt`"  && mount "`cat homepart.txt`" /mnt/home
+        fi
 
 
 
