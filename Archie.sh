@@ -110,9 +110,7 @@ if [ $part == 1 ]; then #Automatic partitioning
                     sephomesize=$(cat sephomesize.txt)
                 done
                 m=$(lsblk -ndb --output NAME,SIZE | grep $seldisk | sed 's/^.* \([^ ]*\)$/\1/' | sed 's/[^0-9.]*//g'); p=$(echo $(( m / 1048576 ))); acchomesize=$(echo $((p*sephomesize/100))) #fuck me, this... wtf is this (converting percents of the disk to an actual size)
-                echo "$acchomesize"
-                echo "$m"
-                echo "$p"
+                
             fi
         }
         autodisk
