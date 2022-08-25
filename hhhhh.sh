@@ -130,8 +130,8 @@ if [ $part == 2 ]; then #Manual partitioning
         dialog --title "Archie installer" --msgbox "Partitions that will be created:\n\nRoot (/): `cat rootpart.txt`\nEFI:`cat efipart.txt`\nSwap:`cat swappart.txt`\nHome:`cat swappart.txt`" 10 50
         count=0
         total=8
-        
-        mkfs.ext4 "/dev/`cat rootpart.txt`" && mkfs.fat -F32 "/dev/`cat efipart.txt`" && mkswap "/dev/`cat swappart.txt`" && mkfs.ext4 "/dev/`cat homepart.txt`" && mount "/dev/`cat rootpart.txt`" /mnt && mkdir /mnt/boot/efi && swapon "/dev/`cat swappart.txt`" && mount "/dev/`cat homepart.txt`" | while read f;
+
+        mkfs.ext4 "`cat rootpart.txt`" && mkfs.fat -F32 "`cat efipart.txt`" && mkswap "`cat swappart.txt`" && mkfs.ext4 "`cat homepart.txt`" && mount "`cat rootpart.txt`" /mnt && mkdir /mnt/boot/efi && swapon "`cat swappart.txt`" && mount "`cat homepart.txt`" | while read f;
         do
         count=$((count+1))
         echo $(( 100*$count/$total ))
