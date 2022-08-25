@@ -130,10 +130,10 @@ if [ $part == 2 ]; then #Manual partitioning
         dialog --title "Archie installer" --msgbox "Partitions that will be created:\n\nRoot (/): `cat rootpart.txt`\nEFI:`cat efipart.txt`\nSwap:`cat swappart.txt`\nHome:`cat swappart.txt`" 10 50
 
         mkfs.ext4 "`cat rootpart.txt`" && mkfs.fat -F32 "`cat efipart.txt`" && mount "`cat rootpart.txt`" /mnt && mkdir -p /mnt/boot/efi && mount "`cat efipart.txt`" /mnt/boot/efi
-        if [ "`cat swappart.txt`" != "skip" ]; then
+        if [ "`cat swappart.txt`" != "skip" ]; then #check if swap is skipped
             mkswap "`cat swappart.txt`" &&  swapon "`cat swappart.txt`"
         fi
-        if [ "`cat homepart.txt`" != skip ]; then
+        if [ "`cat homepart.txt`" != skip ]; then #check if home should be on a separate partition
             mkfs.ext4 "`cat homepart.txt`"  && mount "`cat homepart.txt`" /mnt/home
         fi
 
@@ -165,6 +165,12 @@ if [ $part == 2 ]; then #Manual partitioning
             dialog --title "Error" --msgbox "You have entered an invalid partition, please try again"
             parts3
         done
+        #Partition creation BIOS
+        dialog --title "Archie installer" --msgbox "Partitions that will be created:\n\nRoot (/): `cat rootpart.txt`\nSwap:`cat swappart.txt`" 10 50
+        mkfs.ext4 "`cat rootpart.txt`" && mount "`cat rootpart.txt`" /mnt
+        if [ "`cat swappart.txt`" != "skip" ]; then #check if swap is skipped
+            mkswap "`cat swappart.txt`" &&  swapon "`cat swappart.txt`"
+        fi
         
     fi
 fi
