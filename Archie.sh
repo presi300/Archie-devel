@@ -19,8 +19,8 @@ else
     clear
 fi
 
-umount -a
-swapoff -a
+#umount -a
+#swapoff -a
 rm autodisk.txt             #remove excess config files from a previous instance, if there was one
 rm fdiskconfigshow.sh
 rm fdiskconfig.sh
@@ -227,8 +227,8 @@ if [ $part == 1 ]; then #Automatic partitioning
                 echo -e "n\np\n2\n\n+`cat swapsize.txt`\ny\nt\n82" >> fdiskconfig.sh 
             fi
             echo -e "n\np\n1\n\n" >> fdiskconfig.sh
-            
-                 
+            cp fdiskconfig.sh fdiskconfigshow.sh    
+            chmod +x fdiskconfigshow.sh                         
         }
         fi
 
