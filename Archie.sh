@@ -258,9 +258,7 @@ if [ $part == 1 ]; then #Automatic partitioning
         bash fdiskconfig.sh &> /dev/null
         fdisk -l /dev/$seldisk | grep -s "/dev/$seldisk" | sed 1d &> partitions.txt
         mkfs.ext4 "/dev/`echo $seldisk`1" &> installLog.log #Format root (root is 1st partition here)
-        if [ "$swap" == "Swap = yes" ]; then
-            mkswap "/dev/`echo $seldisk`2" &> installLog.log    #Make swap (swap is 2nd partition here)
-        fi
+        mkswap "/dev/`echo $seldisk`2" &> installLog.log    #Make swap (swap is 2nd partition here)
         mount "/dev/`echo $seldisk`1" /mnt &> installLog.log   #Mount Root
         swapon "/dev/`echo $seldisk`2"    #Swapon
         
