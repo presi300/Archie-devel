@@ -261,8 +261,8 @@ if [ $part == 1 ]; then #Automatic partitioning
         if [ "$swap" == "Swap = yes" ]; then
             mkswap "/dev/`echo $seldisk`2" &> installLog.log    #Make swap (swap is 2nd partition here)
         fi
-        mount "/dev/`echo $seldisk`2" /mnt &> installLog.log   #Mount Root
-        swapon "/dev/`echo $seldisk`3"    #Swapon
+        mount "/dev/`echo $seldisk`1" /mnt &> installLog.log   #Mount Root
+        swapon "/dev/`echo $seldisk`2"    #Swapon
         
     fi
 
