@@ -186,6 +186,31 @@ if [ $part == 1 ]; then #Automatic partitioning
             echo "it worked!" >> installLog.log
 
         fi
+        if [ $isnvme == 0 ]; then #check if p1 abreviation should be used
+            mkfs.fat -F32 "/dev/`echo $seldisk`1" &> installLog.log #Format EFI
+            mkfs.ext4 "/dev/`echo $seldisk`2" &> installLog.log #Format root
+            if [ "$swap" == "Swap = yes" ]; then
+                mkswap "/dev/`echo $seldisk`3" &> installLog.log    #Make swap
+            fi
+            if [ "$homeesp" == "Sephome = yes" ]; then
+                mkfs.ext4 "/dev/`echo $seldisk`4" &> installLog.log #Format home
+            fi
+            echo "it worked!" >> installLog.log
+            mount "/dev/`echo $seldisk`2" /mnt #Mount Root
+            mkdir /mnt/boot/efi
+            mount "/dev/`echo $seldisk`1" /mnt/boot/efi #Mount EFI
+            if [ "$swap" == "Swap = yes" ]; then
+                swapon "/dev/`echo $seldisk`3"    #Swapon
+            fi
+            if [ "$homeesp" == "Sephome = yes" ]; then
+                mkdir /mnt/home
+                mount "/dev/`echo $seldisk`4" /mnt/home #mount home
+            fi
+
+            
+
+        fi
+        
     if [ $efi == 0 ]; then #If BIOS
         echo "hhhhh"
     fi
