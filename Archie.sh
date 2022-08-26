@@ -63,14 +63,14 @@ touch disks.txt
 lsblk -nd --output NAME,SIZE > disks.txt
 disks=$(cat disks.txt | column -t -N "DISK,SIZE")
 
-diskf(){
+diskf(){ #1st disk selector
     dialog --no-cancel --no-collapse  --title "Select a DISK:" --inputbox "$disks" $((diskcount + 7)) 40 2> disk.txt
     seldisk=$(cat disk.txt)
     lsblk -nd --output NAME | grep -x $seldisk &> /dev/null
 
 }
 diskf
-while [ $? != 0 ]; do
+while [ $? != 0 ]; do #1st disk selector error
     dialog --title "Select a Disk" --msgbox "Error: Invalid disk, please enter a valid disk\n\nHINT:The names of the available disks are shown under the DISK column" 10 50
     
     diskf
@@ -84,7 +84,7 @@ part=$(cat part.txt)
 #Check if selected disk in using the nvme prefix
 
 echo $seldisk | grep -E "nvme|zram"
-if [ $? == 0 ]; then
+if [ $? == 0 ]; then #check if p1 partition abreviation should be used 
     echo "1" >> isnvme.txt
 else
     echo "0" >> isnvme.txt
@@ -366,6 +366,6 @@ if [ $part == 2 ]; then #Manual partitioning
     fi
 fi
 
-
+#NOTES: Add a cancel feature to the manual partitioning partition selection
 
 
