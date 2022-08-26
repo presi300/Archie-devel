@@ -169,10 +169,10 @@ if [ $part == 1 ]; then #Automatic partitioning
             rm yes.txt
             autodisk
         done
-        wipefs -a /dev/$seldisk #Wipe disk and apply changes
-        echo -e "w\nE0F" >> fdiskconfig.sh
-        chmod +x fdiskconfig.sh
         dialog --title "Wait..." --infobox "Applying changes to disk..." 10 35
+        wipefs -a /dev/$seldisk &> installLog.log  #Wipe disk and apply changes 
+        echo -e "w\nE0F" >> fdiskconfig.sh 
+        chmod +x fdiskconfig.sh 
         bash fdiskconfig.sh &> /dev/null
         fdisk -l /dev/$seldisk | grep -s "/dev/$seldisk" | sed 1d &> partitions.txt
 
