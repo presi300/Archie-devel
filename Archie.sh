@@ -231,9 +231,30 @@ if [ $part == 1 ]; then #Automatic partitioning
             echo -e "p\nE0F" >> fdiskconfigshow.sh
             chmod +x fdiskconfigshow.sh  
             dialog --no-collapse --title "Archie installer" --yesno "The following changes will be done to the disk (/dev/$seldisk):\n\nBefore:\n`fdisk -l /dev/$seldisk | grep "/dev" | sed 1d | column -t`\n\nAfter:\n`bash fdiskconfigshow.sh | grep "/dev/$seldisk" | sed 1d | column -t `\n\nIs that OK?\n\nWARNING: Selecting <yes> here WILL DELETE ALL THE DATA ON THE SELECTED DISK!"  25 85 #show changes that are going to be made
-                       
         }
+        swap=$(echo autodisk.txt | grep -x "Swap = yes")
         autodisk
+        while [ $? != 0 ]; do #If no is selected on the previous prompt
+            rm fdiskconfig.sh fdiskconfigshow.sh autodisk.txt 
+            dialog --yes-label "OK" --no-label "Exit" --title "Archie installer" --yesno "Select OK and hit ENTER to configure the partitions again or EXIT to exit without making changes..." 10 45
+            if [ $? == 1 ]; then
+                clear
+                echo "Aborting..."
+                exit 1
+            fi
+            rm yes.txt
+            autodisk
+        done
+        dialog --title "Wait..." --infobox "Applying changes to disk..." 10 35
+        wipefs -a /dev/$seldisk &> installLog.log  #Wipe disk and apply changes 
+        echo -e "w\nE0F" >> fdiskconfig.sh 
+        chmod +x fdiskconfig.sh 
+        bash fdiskconfig.sh &> /dev/null
+        fdisk -l /dev/$seldisk | grep -s "/dev/$seldisk" | sed 1d &> partitions.txt
+        mkfs.ext4 "/dev/`echo $seldisk`1" &> installLog.log #Format root (root is 1st partition here)
+        if [ "$swap" == "Swap = yes" ]; then
+            mkswap "/dev/`echo $seldisk`2" &> installLog.log    #Make swap (swap is 2nd partition here)
+        fi
     fi
 
 fi
