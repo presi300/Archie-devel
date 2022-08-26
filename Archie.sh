@@ -30,6 +30,7 @@ rm part.txt
 rn sephomesize.txt
 rm swapsize.txt
 rm yes.txt
+rm isnvme.txt
 #Check if the system is UEFI
 ls /sys/firmware/efi
 
@@ -77,6 +78,16 @@ echo "Selected disk is $seldisk" >> instalLog.log
 
 dialog --no-cancel --title "Archie installer" --menu "Selected disk is: /dev/$seldisk\nHow do you wanna partition the disk?" 10 55 5 \ 1 "Automatic partitioning (Recommended)" \ 2 "Manual partitioning" 2> part.txt
 part=$(cat part.txt)
+
+#Check if selected disk in using the nvme prefix
+
+echo $seldisk | grep -E "nvme|zram"
+if [ $? == 0 ]; then
+    echo "1" >> isnvme.txt
+else
+    echo "0" >> isnvme.txt
+fi
+isnvme=$(cat isnvme.txt)
 
 #Begin partitioning BS
 if1exit(){
@@ -129,11 +140,11 @@ if [ $part == 1 ]; then #Automatic partitioning
             echo "n" >> fdiskconfig.sh; echo "1" >> fdiskconfig.sh; echo "" >> fdiskconfig.sh; echo +300M >> fdiskconfig.sh; echo "t" >> fdiskconfig.sh; echo "1" >> fdiskconfig.sh #Create EFI partition
             cat autodisk.txt | grep -x "Swap = yes"
             if [ $? == 0 ]; then
-                echo -e "n\n\n\n+`cat swapsize.txt`\nt\n\n19" >> fdiskconfig.sh #Swap creation script
+                echo -e "n\n3\n\n+`cat swapsize.txt`\nt\n\n19" >> fdiskconfig.sh #Swap creation script
             fi
             cat autodisk.txt | grep -x "Sephome = yes"
             if [ $? == 0 ]; then
-                echo -e "n\n\n\n+`echo $acchomesize`M" >> fdiskconfig.sh #Separate home creation script
+                echo -e "n\n4\n\n+`echo $acchomesize`M" >> fdiskconfig.sh #Separate home creation script
             fi
             echo -e "n\n\n\n" >> fdiskconfig.sh #Create a root partition with the rest of the space
             cp fdiskconfig.sh fdiskconfigshow.sh
@@ -142,6 +153,8 @@ if [ $part == 1 ]; then #Automatic partitioning
             dialog --no-collapse --title "Archie installer" --yesno "The following changes will be done to the disk (/dev/$seldisk):\n\nBefore:\n`fdisk -l /dev/$seldisk | grep "/dev" | sed 1d | column -t`\n\nAfter:\n`bash fdiskconfigshow.sh | grep "/dev/$seldisk" | sed 1d | column -t `\n\nIs that OK?\n\nWARNING: Selecting <yes> here WILL DELETE ALL THE DATA ON THE SELECTED DISK!"  25 70 #show changes that are going to be made
             
         } 
+        swap=$(echo autodisk.txt | grep -x "Swap = yes")
+        homeesp=$(echo autodisk.txt | grep -x "Sephome = yes")
         autodisk
         while [ $? != 0 ]; do #If no is selected on the previous prompt
             rm fdiskconfig.sh fdiskconfigshow.sh autodisk.txt 
@@ -154,16 +167,28 @@ if [ $part == 1 ]; then #Automatic partitioning
             rm yes.txt
             autodisk
         done
-        wipefs -a /dev/$seldisk
+        wipefs -a /dev/$seldisk #Wipe disk and apply changes
         echo -e "w\nE0F" >> fdiskconfig.sh
         chmod +x fdiskconfig.sh
-        bash fdiskconfig.sh
-       
-        
+        dialog --title "Wait..." --infobox "Applying changes to disk..." 10 35
+        bash fdiskconfig.sh &> /dev/null
+        fdisk -l /dev/$seldisk | grep -s "/dev/$seldisk" | sed 1d > partitions.txt
 
-    fi
+        if [ $isnvme == 1 ]; then #check if p1 abreviation should be used
+            mkfs.fat -F32 "/dev/`echo $seldisk`p1" &> installLog.log #Format EFI
+            mkfs.ext4 "/dev/`echo $seldisk`p2" &> installLog.log #Format root
+            if [ "$swap" == "Swap = yes" ]; then
+                mkswap "/dev/`echo $seldisk`p3" &> installLog.log    #Make swap
+            fi
+            if [ "$homeesp" == "Sephome = yes" ]; then
+                mkfs.ext4 "/dev/`echo $seldisk`p4" &> installLog.log #Format home
+            fi
+            echo "it worked!" >> installLog.log
+
+        fi
     if [ $efi == 0 ]; then #If BIOS
         echo "hhhhh"
+    fi
     fi
 
 fi
