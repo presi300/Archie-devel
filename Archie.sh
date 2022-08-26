@@ -219,7 +219,7 @@ if [ $part == 1 ]; then #Automatic partitioning
                     clear
             fi
              #fdisk partition
-            rm yes.txt
+            rm yes.txt &> installLog.log
             touch fdiskconfig.sh  
             echo "cat << E0F | fdisk /dev/$seldisk" >> fdiskconfig.sh; echo "o" >> fdiskconfig.sh #Begin fdisk script and set a partition label
             cat autodisk.txt | grep -x "Swap = yes"
@@ -228,7 +228,9 @@ if [ $part == 1 ]; then #Automatic partitioning
             fi
             echo -e "n\np\n1\n\n" >> fdiskconfig.sh
             cp fdiskconfig.sh fdiskconfigshow.sh    
-            chmod +x fdiskconfigshow.sh                         
+            chmod +x fdiskconfigshow.sh  
+            dialog --no-collapse --title "Archie installer" --yesno "The following changes will be done to the disk (/dev/$seldisk):\n\nBefore:\n`fdisk -l /dev/$seldisk | grep "/dev" | sed 1d | column -t`\n\nAfter:\n`bash fdiskconfigshow.sh | grep "/dev/$seldisk" | sed 1d | column -t `\n\nIs that OK?\n\nWARNING: Selecting <yes> here WILL DELETE ALL THE DATA ON THE SELECTED DISK!"  25 70 #show changes that are going to be made
+                       
         }
         autodisk
     fi
