@@ -189,25 +189,21 @@ if [ $part == 1 ]; then #Automatic partitioning
         if [ $isnvme == 0 ]; then #check if p1 abreviation should be used
             mkfs.fat -F32 "/dev/`echo $seldisk`1" &> installLog.log #Format EFI
             mkfs.ext4 "/dev/`echo $seldisk`2" &> installLog.log #Format root
-            if [ "$swap" == "Swap = yes" ]; then
-                mkswap "/dev/`echo $seldisk`3" &> installLog.log    #Make swap
-                echo "Swap worked!" >> inseallLog.log
-            fi
-            if [ "$homeesp" == "Sephome = yes" ]; then
-                mkfs.ext4 "/dev/`echo $seldisk`4" &> installLog.log #Format home
-                echo "Home worked!" >> inseallLog.log
-
-            fi
+            mkswap "/dev/`echo $seldisk`3" &> installLog.log    #Make swap
+            mkfs.ext4 "/dev/`echo $seldisk`4" &> installLog.log #Format home
+        
             echo "it worked!" >> installLog.log
             mount "/dev/`echo $seldisk`2" /mnt #Mount Root
             mkdir -p /mnt/boot/efi
             mount "/dev/`echo $seldisk`1" /mnt/boot/efi #Mount EFI
+            swapon "/dev/`echo $seldisk`3"    #Swapon
+            mkdir /mnt/home
+            mount "/dev/`echo $seldisk`4" /mnt/home #mount home
             if [ "$swap" == "Swap = yes" ]; then
-                swapon "/dev/`echo $seldisk`3"    #Swapon
+                
             fi
             if [ "$homeesp" == "Sephome = yes" ]; then
-                mkdir /mnt/home
-                mount "/dev/`echo $seldisk`4" /mnt/home #mount home
+                
             fi
 
             
