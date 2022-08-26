@@ -19,8 +19,17 @@ else
     clear
 fi
 
-rm autodisk.txt
-
+rm autodisk.txt             #remove excess config files from a previous instance, if there was one
+rm fdiskconfigshow.sh
+rm fdiskconfig.sh
+rm disk.txt
+rm disks.txt
+rm EFI.txt
+rm installLog.log
+rm part.txt
+rn sephomesize.txt
+rm swapsize.txt
+rm yes.txt
 #Check if the system is UEFI
 ls /sys/firmware/efi
 
@@ -54,19 +63,19 @@ disks=$(cat disks.txt | column -t -N "DISK,SIZE")
 diskf(){
     dialog --no-cancel --no-collapse  --title "Select a DISK:" --inputbox "$disks" $((diskcount + 7)) 40 2> disk.txt
     seldisk=$(cat disk.txt)
-    lsblk -nd --output NAME | grep -s $seldisk &> /dev/null
+    lsblk -nd --output NAME | grep -x $seldisk &> /dev/null
 
 }
 diskf
 while [ $? != 0 ]; do
-    dialog --title "Select s Disk" --msgbox "Error: Invalid disk, please enter a valid disk\n\nHINT:The names of the available disks are shown under the DISK column" 10 50
+    dialog --title "Select a Disk" --msgbox "Error: Invalid disk, please enter a valid disk\n\nHINT:The names of the available disks are shown under the DISK column" 10 50
     
     diskf
 done
 
 echo "Selected disk is $seldisk" >> instalLog.log
 
-dialog --no-cancel --title "Archie installer" --menu "Selected disk is: /dev/$seldisk/\n How do you wanna partition the disk?" 15 55 5 \ 1 "Automatic partitioning" \ 2 "Manual partitioning" 2> part.txt
+dialog --no-cancel --title "Archie installer" --menu "Selected disk is: /dev/$seldisk\nHow do you wanna partition the disk?" 10 55 5 \ 1 "Automatic partitioning (Recommended)" \ 2 "Manual partitioning" 2> part.txt
 part=$(cat part.txt)
 
 #Begin partitioning BS
@@ -80,9 +89,6 @@ if1exit(){
 
 if [ $part == 1 ]; then #Automatic partitioning
     if [ $efi == 1 ]; then #If EFI
-        dialog --title "WARNING" --yesno "Selecting YES here WILL DELETE ALL THE DATA on the selected disk (/dev/$seldisk)" 10 85
-        if1exit
-        #wipefs -a /dev/$seldisk
         dialog --title "Archie installer" --msgbox "You have chosen to Atomatically partition the disks.\n\nHint: The installer has detected that you are on an UEFI system, meaning that at least 2 partitions will have to be created a Root (/) and an EFI (/boot/efi) partition.\n\nPress ENTER to start configuring the selected disk (/dev/$seldisk/)"   15 80
         touch autodisk.txt
         autodisk(){
@@ -90,7 +96,7 @@ if [ $part == 1 ]; then #Automatic partitioning
             #Swap?
             dialog --title "Archie installer" --yesno "Is a swap partition needed?" 5 40
             if [ $? -eq 0 ]; then #If swap is needed
-                dialog --title "Archie installer" --inputbox "How much swap is needed?\n\nEnter it as <size>G with no space, where G stands for gigabytes of swap\ne.g: for 3GB of swap, enter 3G\n\nRecommended ammount of swap: (Ram / 2)\n\nWARNING: If too much swap is entered or it's entered incorrectly, the installer won't make any swap partitions\n\n$disksize" 15 80 2> swapsize.txt
+                dialog --no-cancel --title "Archie installer" --inputbox "How much swap is needed?\n\nEnter it as <size>G with no space, where G stands for gigabytes of swap\ne.g: for 3GB of swap, enter 3G\n\nRecommended ammount of swap: (Ram / 2)\n\nWARNING: If too much swap is entered or it's entered incorrectly, the installer won't make any swap partitions\n\n$disksize" 15 80 2> swapsize.txt
                 echo "Swap = yes" >> autodisk.txt 
                 echo "Swapsize= `cat swapsize.txt`" >> autodisk.txt 
             fi
@@ -103,7 +109,7 @@ if [ $part == 1 ]; then #Automatic partitioning
                 dialog --title "Archie installer" --yesno "Does home need to be on a separate partition?" 5 60
             if [ $? == 0 ]; then #Separate home is needed
                 echo "Sephome = yes" >> autodisk.txt
-                dialog --title "Archie installer" --inputbox "How many % of the disk do you want your /home partition to be?\n\nRecommended: 65%\nMinimum: 10%\nMaximum: 90%" 13 50 2> sephomesize.txt
+                dialog --no-cancel --title "Archie installer" --inputbox "How many % of the disk do you want your /home partition to be?\n\nRecommended: 65%\nMinimum: 10%\nMaximum: 90%" 13 50 2> sephomesize.txt
                 sephomesize=$(cat sephomesize.txt)
                 while [ $sephomesize -lt 10 ] || [ $sephomesize -gt 90 ]; do
                     dialog --no-cancel --title "Error" --msgbox "Selected amount of space must be between 10% and 90%!\n\nPlease try again..." 10 45
@@ -117,18 +123,43 @@ if [ $part == 1 ]; then #Automatic partitioning
                 clear
             fi
             #fdisk partition
+            rm yes.txt
             touch fdiskconfig.sh
             echo "cat << E0F | fdisk /dev/$seldisk" >> fdiskconfig.sh; echo "g" >> fdiskconfig.sh #Begin fdisk script and set a partition label
             echo "n" >> fdiskconfig.sh; echo "1" >> fdiskconfig.sh; echo "" >> fdiskconfig.sh; echo +300M >> fdiskconfig.sh; echo "t" >> fdiskconfig.sh; echo "1" >> fdiskconfig.sh #Create EFI partition
             cat autodisk.txt | grep -x "Swap = yes"
             if [ $? == 0 ]; then
-                echo -e "n\n\n\n\n+`cat swapsize.txt`\nt\n2\n19" >> fdiskconfig.sh
+                echo -e "n\n\n\n+`cat swapsize.txt`\nt\n\n19" >> fdiskconfig.sh #Swap creation script
             fi
-            
+            cat autodisk.txt | grep -x "Sephome = yes"
+            if [ $? == 0 ]; then
+                echo -e "n\n\n\n+`echo $acchomesize`M" >> fdiskconfig.sh #Separate home creation script
+            fi
+            echo -e "n\n\n\n" >> fdiskconfig.sh #Create a root partition with the rest of the space
+            cp fdiskconfig.sh fdiskconfigshow.sh
+            echo -e "p\nE0F" >> fdiskconfigshow.sh
+            chmod +x fdiskconfigshow.sh
+            dialog --no-collapse --title "Archie installer" --yesno "The following changes will be done to the disk (/dev/$seldisk):\n\nBefore:\n`fdisk -l /dev/$seldisk | grep "/dev" | sed 1d | column -t`\n\nAfter:\n`bash fdiskconfigshow.sh | grep "/dev/$seldisk" | sed 1d | column -t `\n\nIs that OK?\n\nWARNING: Selecting <yes> here WILL DELETE ALL THE DATA ON THE SELECTED DISK!"  25 70 #show changes that are going to be made
             
         } 
-        dialog --title "Archie installer" --yesno "The following partitions will be created on disk $dsksize :\n\nSwap: `cat autodisk.txt | grep 'Swapsize' | sed 's/^.* \([^ ]*\)$/\1/'` "
         autodisk
+        while [ $? != 0 ]; do #If no is selected on the previous prompt
+            rm fdiskconfig.sh fdiskconfigshow.sh autodisk.txt 
+            dialog --yes-label "OK" --no-label "Exit" --title "Archie installer" --yesno "Select OK and hit ENTER to configure the partitions again or EXIT to exit without making changes..." 10 45
+            if [ $? == 1 ]; then
+                clear
+                echo "Aborting..."
+                exit 1
+            fi
+            rm yes.txt
+            autodisk
+        done
+        wipefs -a /dev/$seldisk
+        echo -e "w\nE0F" >> fdiskconfig.sh
+        chmod +x fdiskconfig.sh
+        bash fdiskconfig.sh
+       
+        
 
     fi
     if [ $efi == 0 ]; then #If BIOS

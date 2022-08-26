@@ -1,2 +1,0 @@
-Swap = yes
-Swapsize= 1G
