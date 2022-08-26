@@ -80,7 +80,7 @@ if1exit(){
 
 if [ $part == 1 ]; then #Automatic partitioning
     if [ $efi == 1 ]; then #If EFI
-        dialog --title "WARNING" --yesno "Selecting YES here WILL DELETE ALL THE DATA on the selected disk (/dev/$seldisk/)" 10 85
+        dialog --title "WARNING" --yesno "Selecting YES here WILL DELETE ALL THE DATA on the selected disk (/dev/$seldisk)" 10 85
         if1exit
         #wipefs -a /dev/$seldisk
         dialog --title "Archie installer" --msgbox "You have chosen to Atomatically partition the disks.\n\nHint: The installer has detected that you are on an UEFI system, meaning that at least 2 partitions will have to be created a Root (/) and an EFI (/boot/efi) partition.\n\nPress ENTER to start configuring the selected disk (/dev/$seldisk/)"   15 80
@@ -92,10 +92,11 @@ if [ $part == 1 ]; then #Automatic partitioning
             if [ $? -eq 0 ]; then #If swap is needed
                 dialog --title "Archie installer" --inputbox "How much swap is needed?\n\nEnter it as <size>G with no space, where G stands for gigabytes of swap\ne.g: for 3GB of swap, enter 3G\n\nRecommended ammount of swap: (Ram / 2)\n\nWARNING: If too much swap is entered or it's entered incorrectly, the installer won't make any swap partitions\n\n$disksize" 15 80 2> swapsize.txt
                 echo "Swap = yes" >> autodisk.txt 
-                echo "Swapsize = `cat swapsize.txt`" >> autodisk.txt 
+                echo "Swapsize= `cat swapsize.txt`" >> autodisk.txt 
             fi
             if [ $? != 0 ]; then #If swap isn't needed
                 echo "Swap = no" >> autodisk.txt
+                echo "Swapsize= 0" >> autodisk.txt
                 clear
             fi
             #Home?
@@ -110,9 +111,23 @@ if [ $part == 1 ]; then #Automatic partitioning
                     sephomesize=$(cat sephomesize.txt)
                 done
                 m=$(lsblk -ndb --output NAME,SIZE | grep $seldisk | sed 's/^.* \([^ ]*\)$/\1/' | sed 's/[^0-9.]*//g'); p=$(echo $(( m / 1048576 ))); acchomesize=$(echo $((p*sephomesize/100))) #fuck me, this... wtf is this (converting percents of the disk to an actual size)
-                
+               
             fi
-        }
+            if [ $? != 0 ]; then #Separate home is not needed
+                clear
+            fi
+            #fdisk partition
+            touch fdiskconfig.sh
+            echo "cat << E0F | fdisk /dev/$seldisk" >> fdiskconfig.sh; echo "g" >> fdiskconfig.sh #Begin fdisk script and set a partition label
+            echo "n" >> fdiskconfig.sh; echo "1" >> fdiskconfig.sh; echo "" >> fdiskconfig.sh; echo +300M >> fdiskconfig.sh; echo "t" >> fdiskconfig.sh; echo "1" >> fdiskconfig.sh #Create EFI partition
+            cat autodisk.txt | grep -x "Swap = yes"
+            if [ $? == 0 ]; then
+                echo -e "n\n\n\n\n+`cat swapsize.txt`\nt\n2\n19" >> fdiskconfig.sh
+            fi
+            
+            
+        } 
+        dialog --title "Archie installer" --yesno "The following partitions will be created on disk $dsksize :\n\nSwap: `cat autodisk.txt | grep 'Swapsize' | sed 's/^.* \([^ ]*\)$/\1/'` "
         autodisk
 
     fi

@@ -1,0 +1,10 @@
+cat <<EOF | fdisk /dev/zram0
+g
+n
+1
+
++300M
+t
+1
+w
+EOF
