@@ -191,9 +191,12 @@ if [ $part == 1 ]; then #Automatic partitioning
             mkfs.ext4 "/dev/`echo $seldisk`2" &> installLog.log #Format root
             if [ "$swap" == "Swap = yes" ]; then
                 mkswap "/dev/`echo $seldisk`3" &> installLog.log    #Make swap
+                echo "Swap worked!" >> inseallLog.log
             fi
             if [ "$homeesp" == "Sephome = yes" ]; then
                 mkfs.ext4 "/dev/`echo $seldisk`4" &> installLog.log #Format home
+                echo "Home worked!" >> inseallLog.log
+
             fi
             echo "it worked!" >> installLog.log
             mount "/dev/`echo $seldisk`2" /mnt #Mount Root
