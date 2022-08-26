@@ -19,6 +19,8 @@ else
     clear
 fi
 
+umount -a
+swapoff -a
 rm autodisk.txt             #remove excess config files from a previous instance, if there was one
 rm fdiskconfigshow.sh
 rm fdiskconfig.sh
