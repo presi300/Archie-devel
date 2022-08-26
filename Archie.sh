@@ -174,7 +174,7 @@ if [ $part == 1 ]; then #Automatic partitioning
         chmod +x fdiskconfig.sh
         dialog --title "Wait..." --infobox "Applying changes to disk..." 10 35
         bash fdiskconfig.sh &> /dev/null
-        fdisk -l /dev/$seldisk | grep -s "/dev/$seldisk" | sed 1d > partitions.txt
+        fdisk -l /dev/$seldisk | grep -s "/dev/$seldisk" | sed 1d &> partitions.txt
 
         if [ $isnvme == 1 ]; then #check if p1 abreviation should be used
             mkfs.fat -F32 "/dev/`echo $seldisk`p1" &> installLog.log #Format EFI
@@ -185,7 +185,7 @@ if [ $part == 1 ]; then #Automatic partitioning
             if [ "$homeesp" == "Sephome = yes" ]; then
                 mkfs.ext4 "/dev/`echo $seldisk`p4" &> installLog.log #Format home
             fi
-            echo "it worked!" >> installLog.log
+            
 
         fi
         if [ $isnvme == 0 ]; then #check if p1 abreviation should be used
@@ -194,13 +194,13 @@ if [ $part == 1 ]; then #Automatic partitioning
             mkswap "/dev/`echo $seldisk`3" &> installLog.log    #Make swap
             mkfs.ext4 "/dev/`echo $seldisk`4" &> installLog.log #Format home
         
-            echo "it worked!" >> installLog.log
-            mount "/dev/`echo $seldisk`2" /mnt #Mount Root
-            mkdir -p /mnt/boot/efi
-            mount "/dev/`echo $seldisk`1" /mnt/boot/efi #Mount EFI
+           
+            mount "/dev/`echo $seldisk`2" /mnt &> installLog.log   #Mount Root
+            mkdir -p /mnt/boot/efi &> installLog.log
+            mount "/dev/`echo $seldisk`1" /mnt/boot/efi &> installLog.log #Mount EFI
             swapon "/dev/`echo $seldisk`3"    #Swapon
-            mkdir /mnt/home
-            mount "/dev/`echo $seldisk`4" /mnt/home #mount home
+            mkdir /mnt/home &> installLog.log
+            mount "/dev/`echo $seldisk`4" /mnt/home &> installLog.log #mount home
         fi
         
     if [ $efi == 0 ]; then #If BIOS
