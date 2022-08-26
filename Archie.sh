@@ -199,15 +199,6 @@ if [ $part == 1 ]; then #Automatic partitioning
             swapon "/dev/`echo $seldisk`3"    #Swapon
             mkdir /mnt/home
             mount "/dev/`echo $seldisk`4" /mnt/home #mount home
-            if [ "$swap" == "Swap = yes" ]; then
-                
-            fi
-            if [ "$homeesp" == "Sephome = yes" ]; then
-                
-            fi
-
-            
-
         fi
         
     if [ $efi == 0 ]; then #If BIOS
