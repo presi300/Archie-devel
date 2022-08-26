@@ -197,7 +197,7 @@ if [ $part == 1 ]; then #Automatic partitioning
             fi
             echo "it worked!" >> installLog.log
             mount "/dev/`echo $seldisk`2" /mnt #Mount Root
-            mkdir /mnt/boot/efi
+            mkdir -p /mnt/boot/efi
             mount "/dev/`echo $seldisk`1" /mnt/boot/efi #Mount EFI
             if [ "$swap" == "Swap = yes" ]; then
                 swapon "/dev/`echo $seldisk`3"    #Swapon
