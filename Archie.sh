@@ -184,6 +184,12 @@ if [ $part == 1 ]; then #Automatic partitioning
             if [ "$homeesp" == "Sephome = yes" ]; then
                 mkfs.ext4 "/dev/`echo $seldisk`p4" &> installLog.log #Format home
             fi
+            mount "/dev/`echo $seldisk`p2" /mnt &> installLog.log   #Mount Root
+            mkdir -p /mnt/boot/efi &> installLog.log
+            mount "/dev/`echo $seldisk`p1" /mnt/boot/efi &> installLog.log #Mount EFI
+            swapon "/dev/`echo $seldisk`p3"    #Swapon
+            mkdir /mnt/home &> installLog.log
+            mount "/dev/`echo $seldisk`p4" /mnt/home &> installLog.log #mount home
             
 
         fi
@@ -255,6 +261,9 @@ if [ $part == 1 ]; then #Automatic partitioning
         if [ "$swap" == "Swap = yes" ]; then
             mkswap "/dev/`echo $seldisk`2" &> installLog.log    #Make swap (swap is 2nd partition here)
         fi
+        mount "/dev/`echo $seldisk`2" /mnt &> installLog.log   #Mount Root
+        swapon "/dev/`echo $seldisk`3"    #Swapon
+        
     fi
 
 fi
