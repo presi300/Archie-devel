@@ -201,7 +201,7 @@ if [ $part == 1 ]; then #Automatic partitioning
             mkdir /mnt/home &> installLog.log
             mount "/dev/`echo $seldisk`4" /mnt/home &> installLog.log #mount home
         fi
-        
+    fi
     if [ $efi == 0 ]; then #If BIOS
         dialog --title "Archie installer" --msgbox "You have chosen to Atomatically partition the disks.\n\nHint: The installer has detected that you are on an BIOS/Legacy system, meaning that at least 1 partition will have to be created a Root (/).\n\nPress ENTER to start configuring the selected disk (/dev/$seldisk/)" 15 80
         touch autodisk.txt
@@ -217,7 +217,7 @@ if [ $part == 1 ]; then #Automatic partitioning
                     echo "Swap = no" >> autodisk.txt
                     echo "Swapsize= 0" >> autodisk.txt
                     clear
-                fi
+            fi
              #fdisk partition
             rm yes.txt
             touch fdiskconfig.sh  
@@ -230,9 +230,7 @@ if [ $part == 1 ]; then #Automatic partitioning
             cp fdiskconfig.sh fdiskconfigshow.sh    
             chmod +x fdiskconfigshow.sh                         
         }
-        fi
-
-
+        autodisk
     fi
 
 fi
