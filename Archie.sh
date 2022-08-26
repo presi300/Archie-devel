@@ -154,8 +154,6 @@ if [ $part == 1 ]; then #Automatic partitioning
             dialog --no-collapse --title "Archie installer" --yesno "The following changes will be done to the disk (/dev/$seldisk):\n\nBefore:\n`fdisk -l /dev/$seldisk | grep "/dev" | sed 1d | column -t`\n\nAfter:\n`bash fdiskconfigshow.sh | grep "/dev/$seldisk" | sed 1d | column -t `\n\nIs that OK?\n\nWARNING: Selecting <yes> here WILL DELETE ALL THE DATA ON THE SELECTED DISK!"  25 70 #show changes that are going to be made
             
         } 
-        swap=$(echo autodisk.txt | grep -x "Swap = yes")
-        homeesp=$(echo autodisk.txt | grep -x "Sephome = yes")
         autodisk
         while [ $? != 0 ]; do #If no is selected on the previous prompt
             rm fdiskconfig.sh fdiskconfigshow.sh autodisk.txt 
@@ -178,12 +176,9 @@ if [ $part == 1 ]; then #Automatic partitioning
         if [ $isnvme == 1 ]; then #check if p1 abreviation should be used
             mkfs.fat -F32 "/dev/`echo $seldisk`p1" &> installLog.log #Format EFI
             mkfs.ext4 "/dev/`echo $seldisk`p2" &> installLog.log #Format root
-            if [ "$swap" == "Swap = yes" ]; then
-                mkswap "/dev/`echo $seldisk`p3" &> installLog.log    #Make swap
-            fi
-            if [ "$homeesp" == "Sephome = yes" ]; then
-                mkfs.ext4 "/dev/`echo $seldisk`p4" &> installLog.log #Format home
-            fi
+            mkswap "/dev/`echo $seldisk`p3" &> installLog.log    #Make swap
+            mkfs.ext4 "/dev/`echo $seldisk`p4" &> installLog.log #Format home
+          
             mount "/dev/`echo $seldisk`p2" /mnt &> installLog.log   #Mount Root
             mkdir -p /mnt/boot/efi &> installLog.log
             mount "/dev/`echo $seldisk`p1" /mnt/boot/efi &> installLog.log #Mount EFI
@@ -238,7 +233,6 @@ if [ $part == 1 ]; then #Automatic partitioning
             chmod +x fdiskconfigshow.sh  
             dialog --no-collapse --title "Archie installer" --yesno "The following changes will be done to the disk (/dev/$seldisk):\n\nBefore:\n`fdisk -l /dev/$seldisk | grep "/dev" | sed 1d | column -t`\n\nAfter:\n`bash fdiskconfigshow.sh | grep "/dev/$seldisk" | sed 1d | column -t `\n\nIs that OK?\n\nWARNING: Selecting <yes> here WILL DELETE ALL THE DATA ON THE SELECTED DISK!"  25 75 #show changes that are going to be made
         }
-        swap=$(echo autodisk.txt | grep -x "Swap = yes")
         autodisk
         while [ $? != 0 ]; do #If no is selected on the previous prompt
             rm fdiskconfig.sh fdiskconfigshow.sh autodisk.txt 
