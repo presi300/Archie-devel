@@ -105,7 +105,6 @@ if [ $part == 1 ]; then #Automatic partitioning
         dialog --title "Archie installer" --msgbox "You have chosen to Atomatically partition the disks.\n\nHint: The installer has detected that you are on an UEFI system, meaning that at least 2 partitions will have to be created a Root (/) and an EFI (/boot/efi) partition.\n\nPress ENTER to start configuring the selected disk (/dev/$seldisk/)"   15 80
         touch autodisk.txt
         autodisk(){
-            dsksize=$(lsblk -nd --output NAME,SIZE | grep $seldisk)
             #Swap?
             dialog --title "Archie installer" --yesno "Is a swap partition needed?" 5 40
             if [ $? -eq 0 ]; then #If swap is needed
@@ -141,12 +140,12 @@ if [ $part == 1 ]; then #Automatic partitioning
             echo "cat << E0F | fdisk /dev/$seldisk" >> fdiskconfig.sh; echo "g" >> fdiskconfig.sh #Begin fdisk script and set a partition label
             echo "n" >> fdiskconfig.sh; echo "1" >> fdiskconfig.sh; echo "" >> fdiskconfig.sh; echo +300M >> fdiskconfig.sh; echo "t" >> fdiskconfig.sh; echo "1" >> fdiskconfig.sh #Create EFI partition
             cat autodisk.txt | grep -x "Swap = yes"
-            if [ $? == 0 ]; then
-                echo -e "n\n3\n\n+`cat swapsize.txt`\nt\n\n19" >> fdiskconfig.sh #Swap creation script
+            if [ $? == 0 ]; then #Swap creation script
+                echo -e "n\n3\n\n+`cat swapsize.txt`\nt\n\n19" >> fdiskconfig.sh 
             fi
             cat autodisk.txt | grep -x "Sephome = yes"
-            if [ $? == 0 ]; then
-                echo -e "n\n4\n\n+`echo $acchomesize`M" >> fdiskconfig.sh #Separate home creation script
+            if [ $? == 0 ]; then #Separate home creation script
+                echo -e "n\n4\n\n+`echo $acchomesize`M" >> fdiskconfig.sh 
             fi
             echo -e "n\n\n\n" >> fdiskconfig.sh #Create a root partition with the rest of the space
             cp fdiskconfig.sh fdiskconfigshow.sh
@@ -204,8 +203,36 @@ if [ $part == 1 ]; then #Automatic partitioning
         fi
         
     if [ $efi == 0 ]; then #If BIOS
-        echo "hhhhh"
-    fi
+        dialog --title "Archie installer" --msgbox "You have chosen to Atomatically partition the disks.\n\nHint: The installer has detected that you are on an BIOS/Legacy system, meaning that at least 1 partition will have to be created a Root (/).\n\nPress ENTER to start configuring the selected disk (/dev/$seldisk/)"   15 80
+        touch autodisk.txt
+        #Swap?
+        autodisk(){
+            dialog --title "Archie installer" --yesno "Is a swap partition needed?" 5 40
+            if [ $? -eq 0 ]; then #If swap is needed
+                dialog --no-cancel --title "Archie installer" --inputbox "How much swap is needed?\n\nEnter it as <size>G with no space, where G stands for gigabytes of swap\ne.g: for 3GB of swap, enter 3G\n\nRecommended ammount of swap: (Ram / 2)\n\nWARNING: If too much swap is entered or it's entered incorrectly, the installer won't make any swap partitions\n\n$disksize" 15 80 2> swapsize.txt
+                echo "Swap = yes" >> autodisk.txt 
+                echo "Swapsize= `cat swapsize.txt`" >> autodisk.txt 
+            fi        
+            if [ $? != 0 ]; then #If swap isn't needed
+                    echo "Swap = no" >> autodisk.txt
+                    echo "Swapsize= 0" >> autodisk.txt
+                    clear
+                fi
+             #fdisk partition
+            rm yes.txt
+            touch fdiskconfig.sh  
+            echo "cat << E0F | fdisk /dev/$seldisk" >> fdiskconfig.sh; echo "o" >> fdiskconfig.sh #Begin fdisk script and set a partition label
+            cat autodisk.txt | grep -x "Swap = yes"
+            if [ $? == 0 ]; then #Swap creation script
+                echo -e "n\np\n2\n\n+`cat swapsize.txt`\ny\nt\n82" >> fdiskconfig.sh 
+            fi
+            echo -e "n\np\n1\n\n" >> fdiskconfig.sh
+            
+                 
+        }
+        fi
+
+
     fi
 
 fi

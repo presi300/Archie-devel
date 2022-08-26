@@ -1,2 +1,0 @@
-/dev/zram0p1   256   77055   76800  300M EFI System
-/dev/zram0p2 77056 1310463 1233408  4.7G Linux filesystem
