@@ -203,8 +203,7 @@ if [ $part == 1 ]; then #Automatic partitioning
         fi
         
     if [ $efi == 0 ]; then #If BIOS
-        dialog --title "Archie installer" --msgbox "You have chosen to Atomatically partition the disks.\n\nHint: The installer has detected that you are on an BIOS/Legacy system, meaning that at least 1 partition will have to be created a Root (/).\n\nPress ENTER to start configuring the selected disk (/dev/$seldisk/)" 
-        15 80
+        dialog --title "Archie installer" --msgbox "You have chosen to Atomatically partition the disks.\n\nHint: The installer has detected that you are on an BIOS/Legacy system, meaning that at least 1 partition will have to be created a Root (/).\n\nPress ENTER to start configuring the selected disk (/dev/$seldisk/)" 15 80
         touch autodisk.txt
         #Swap?
         autodisk(){
