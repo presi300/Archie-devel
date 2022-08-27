@@ -33,6 +33,8 @@ rn sephomesize.txt
 rm swapsize.txt
 rm yes.txt
 rm isnvme.txt
+rm packages.inst
+rm GPU.txt
 #Check if the system is UEFI
 ls /sys/firmware/efi
 
@@ -47,21 +49,86 @@ efi=$(cat EFI.txt)
 
 clear
 
-echo "Installing dependencies, please wait..."
-pacman -S dialog util-linux sed --noconfirm &> /dev/null
+echo "Installing dependencies, please wait..."  #install dependencies
+pacman -Syy dialog util-linux sed lshw --noconfirm &> /dev/null
 
 clear
+
+touch packages.inst     #Create the file for installed packages
 
 #Begin ncurses thing
 
 dialog --title "Archie installer" --msgbox "Welcome to the Archie installer!" 5 36
 
+#Detect GPU
+
+dialog --title "Wait..." --infobox "Detecting graphics adapter, please wait..." 5 50    #lshw is slow lol
+
+lshw -numeric -C display &> lshw.txt    #Piping this command to a file because it's slow
+
+gpucheck(){     #I got tired of copy pasting this horrible line, so here's a function for it
+    cat lshw.txt  | grep "product:" | sed -e 's/^\w*\ *//' | sed 's,/[^/]*$,,' | sed 's/[:[]//g' | sed 's/[]]//g' | sed 's/\<product\>//g'  | sed -e 's/^[ \t]*//'
+} 
+
+cat lshw.txt | grep "AMD"    #Check for AMD
+if [ $? == 0 ]; then
+    dialog --yes-label "Automatic" --no-label "Manual" --title "Archie installer" --yesno "The installer has detected AMD graphics! GPUs detected:\n\n`gpucheck`\n\n\n\nDo you want to proceed with automatic setup or do you wanna configure it by yourself later?\n\nNote: Choosing to configure it by yourself will mean that the installer will NOT install any X display drivers" 20 75  #Regex is my passion (idfk how sed works, i just throw stuff at it untill it works)
+    if [ $? == 0 ]; then
+        echo " xf86-video-amdgpu " >> packages.inst
+        echo "AMD" > GPU.txt
+    else [ $? != 0 ]
+        echo "Manual" > GPU.txt
+    fi
+fi
+
+cat lshw.txt | grep "NVIDIA"    #Check for NVIDIA (Fuck you, Nvidia)
+if [ $? == 0 ]; then
+    nvidia=1
+    echo "NVIDIA" > GPU.txt
+fi
+
+cat lshw.txt | grep "Intel"     
+if [ $? == 0 ]; then    #Check for Intel
+    intel=1
+    if [ $nvidia == 1 ]; then   #Check for both intel and nvidia
+        dialog --title "Archie installer" --menu "The installer has detected both Intel and Nvidia graphics! GPUs detected:\n\n`gpucheck`\n\nNote: As of right now the installer can't setup switchable graphics (I have no idea how to do that reliably and i have no way to test it currently), so if this screen appears and you're on a laptop, select either 'Use Intel graphics' or 'Manual configuration'" 60 70 4 1 "Use the Nvidia proprietaty driver" 2 "Use the Nvidia FOSS driver (Nouveau)" 3 "Use Intel graphics" 4 "Manual configuration" 2> nvidiachoice.txt
+        nvidiachoice=$(cat nvidiachoice.txt)
+        if [ $nvidiachoice == 1 ]; then     #Proprietary driver selected
+            echo "NVIDIA Proprietary" > GPU.txt
+            echo " nvidia nvidia-settings " >> packages.inst
+        elif [ $nvidiachoice == 2 ]; then   #Nouveau selected
+            echo "NVIDIA FOSS" > GPU.txt
+            echo " xf86-video-nouveau " >> packages.inst    #Intel selected
+        elif [ $nvidiachoice == 3 ]; then
+            echo "Intel" > GPU.txt
+            echo " xf86-video-intel " >> packages.inst      #Manual configuration selected
+        elif [ $nvidiachoice == 4 ]; then
+            echo "Manual" > GPU.txt
+        fi
+    elif [ $nvidia != 1 ]; then
+        dialog --yes-label "Automatic" --no-label "Manual" --title "Archie installer" --yesno "The installer has detected Intel graphics! GPUs detected:\n\n`gpucheck`\n\n\n\nDo you want to proceed with automatic setup or do you wanna configure it by yourself later?\n\nNote: Choosing to configure it by yourself will mean that the installer will NOT install any X display drivers" 20 75
+        if [ $? == 0 ]; then
+            echo "Intel" > GPU.txt
+            echo " xf86-video-intel " >> packages.inst
+        else
+            echo "Manual" > GPU.txt
+        fi
+    fi
+fi
+
+if [ $intel != 1 ] && [ $nvidia == 1 ]; then    #Check for Nvidia (Fuck you Nvidia)
+    dialog --title "Archie installer" --menu "The installer has detected Nvidia graphics! GPUs detected:\n\n`gpucheck`\n\nNote: If you're using an oler graphics cart (older than GTX 700 series), you'll wanna choose the 'Nvidia FOSS (Nouveau driver)'" 60 70 4 1 "Use the Nvidia proprietaty driver" 2 "Use the Nvidia FOSS driver (Nouveau)" 3. "Manual configuration"
+fi
+
+
 #Install profile selector
 
 dialog --title "Archie installer" --menu "Select an installation profile" 10 40 5 1 "Desktop" 2 "Minimal" 2> profile.txt
-touch packages.inst
 if [ "`cat profile.txt`" == 1 ]; then #Desktop profile
-    dialog --title "Archie installer" --menu "Choose a desktop environment" 15 40 10 1 "KDE Plasma" 2 "Gnome" 3 "XFCE" 4 "Qtile"
+    dialog --title "Archie installer" --menu "Choose a desktop environment" 15 40 10 1 "KDE Plasma" 2 "Gnome" 3 "XFCE" 4 "Qtile" 2> DE.txt
+    if [ "`cat DE.txt`" == 1 ]; then
+        cat " plasma xorg sddm grub networkmanager neofetch sudo htop nvim dolphin gwenview spectacle konsole ark unzip p7zip "
+    fi
 fi
 if [ "`cat profile.txt`" == 2 ]; then #Minimal profile
     dialog --title "Archie installer" --msgbox "You have chosen to have a minimal installation!\n\nNote: This will not install X or any sort of sound system, just the bare minimum to get a functional system!" 20 70
