@@ -4,7 +4,7 @@ clear
 #Is on default installation thing?
 touch installLog.log
 cat /etc/issue | grep "Arch Linux" &> installLog.log
-if [ $? != 0 ]; then
+if [ $? != 0 ]; then #check if running on the official iso
     echo "An error occured, unsupported OS, please use this script only in the default Arch Linux install environment!"
     exit 0
 else
@@ -12,7 +12,7 @@ else
 fi
 #Is run with root?
 whoami | grep "root" &> installLog.log 
-if [ $? != 0 ]; then
+if [ $? != 0 ]; then #Check if is running as root
     echo "An error occured, please run the script as root!"
     exit 0
 else
@@ -55,6 +55,20 @@ clear
 #Begin ncurses thing
 
 dialog --title "Archie installer" --msgbox "Welcome to the Archie installer!" 5 36
+
+#Install profile selector
+
+dialog --title "Archie installer" --menu "Select an installation profile" 10 40 5 1 "Desktop" 2 "Minimal" 2> profile.txt
+touch packages.inst
+if [ "`cat profile.txt`" == 1 ]; then #Desktop profile
+    dialog --title "Archie installer" --menu "Choose a desktop environment" 15 40 10 1 "KDE Plasma" 2 "Gnome" 3 "XFCE" 4 "Qtile"
+fi
+if [ "`cat profile.txt`" == 2 ]; then #Minimal profile
+    dialog --title "Archie installer" --msgbox "You have chosen to have a minimal installation!\n\nNote: This will not install X or any sort of sound system, just the bare minimum to get a functional system!" 20 70
+    echo " grub networkmanager neofetch sudo htop nvim " >> packages.inst
+fi
+
+
 
 #Select Disk
 
