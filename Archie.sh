@@ -70,7 +70,7 @@ gpucheck(){     #I got tired of copy pasting this horrible line, so here's a fun
     cat lshw.txt  | grep "product:" | sed -e 's/^\w*\ *//' | sed 's,/[^/]*$,,' | sed 's/[:[]//g' | sed 's/[]]//g' | sed 's/\<product\>//g'  | sed -e 's/^[ \t]*//'
 } 
 
-cat lshw.txt | grep "AMD"    #Check for AMD
+cat lshw.txt | grep "AMD" &> installLog.log   #Check for AMD
 if [ $? == 0 ]; then
     dialog --yes-label "Automatic" --no-label "Manual" --no-collapse --title "Archie installer" --yesno "The installer has detected AMD graphics! GPUs detected:\n\n`gpucheck`\n\n\n\nDo you want to proceed with automatic setup or do you wanna configure it by yourself later?\n\nNote: Choosing to configure it by yourself will mean that the installer will NOT install any X display drivers" 20 75  #Regex is my passion (idfk how sed works, i just throw stuff at it untill it works)
     if [ $? == 0 ]; then
@@ -81,12 +81,12 @@ if [ $? == 0 ]; then
     fi
 fi
 
-cat lshw.txt | grep "NVIDIA"    #Check for NVIDIA (Fuck you, Nvidia)
+cat lshw.txt | grep "NVIDIA" &> installLog.log   #Check for NVIDIA (Fuck you, Nvidia)
 if [ $? == 0 ]; then
     nvidia=1
 fi
 
-cat lshw.txt | grep "Intel"     
+cat lshw.txt | grep "Intel" &> installLog.log
 if [ $? == 0 ]; then    #Check for Intel
     intel=1
     if [ $nvidia == 1 ]; then   #Check for both intel and nvidia
