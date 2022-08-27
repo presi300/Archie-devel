@@ -90,6 +90,7 @@ fi
 cat lshw.txt | grep "Intel" &> installLog.log
 if [ $? == 0 ]; then    #Check for Intel
     intel=1
+    echo "Intel" >> GPU.txt
     if [ $nvidia == 1 ]; then   #Check for both intel and nvidia
         dialog --no-canel --no-collapse --title "Archie installer" --menu "The installer has detected both Intel and Nvidia graphics! GPUs detected:\n\n`gpucheck`\n\nNote: As of right now the installer can't setup switchable graphics (I have no idea how to do that reliably and i have no way to test it currently), so if this screen appears and you're on a laptop, select either 'Use Intel graphics' or 'Manual configuration'" 60 70 4 1 "Use the Nvidia proprietaty driver" 2 "Use the Nvidia FOSS driver (Nouveau)" 3 "Use Intel graphics" 4 "Manual configuration" 2> nvidiachoice.txt
         nvidiachoice=$(cat nvidiachoice.txt)
