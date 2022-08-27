@@ -84,7 +84,6 @@ fi
 cat lshw.txt | grep "NVIDIA"    #Check for NVIDIA (Fuck you, Nvidia)
 if [ $? == 0 ]; then
     nvidia=1
-    echo "NVIDIA" > GPU.txt
 fi
 
 cat lshw.txt | grep "Intel"     
