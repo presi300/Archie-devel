@@ -72,7 +72,7 @@ gpucheck(){     #I got tired of copy pasting this horrible line, so here's a fun
 
 cat lshw.txt | grep "AMD"    #Check for AMD
 if [ $? == 0 ]; then
-    dialog --yes-label "Automatic" --no-label "Manual" --title "Archie installer" --yesno "The installer has detected AMD graphics! GPUs detected:\n\n`gpucheck`\n\n\n\nDo you want to proceed with automatic setup or do you wanna configure it by yourself later?\n\nNote: Choosing to configure it by yourself will mean that the installer will NOT install any X display drivers" 20 75  #Regex is my passion (idfk how sed works, i just throw stuff at it untill it works)
+    dialog --yes-label "Automatic" --no-label "Manual" --no-collapse --title "Archie installer" --yesno "The installer has detected AMD graphics! GPUs detected:\n\n`gpucheck`\n\n\n\nDo you want to proceed with automatic setup or do you wanna configure it by yourself later?\n\nNote: Choosing to configure it by yourself will mean that the installer will NOT install any X display drivers" 20 75  #Regex is my passion (idfk how sed works, i just throw stuff at it untill it works)
     if [ $? == 0 ]; then
         echo " xf86-video-amdgpu " >> packages.inst
         echo "AMD" > GPU.txt
@@ -91,7 +91,7 @@ cat lshw.txt | grep "Intel"
 if [ $? == 0 ]; then    #Check for Intel
     intel=1
     if [ $nvidia == 1 ]; then   #Check for both intel and nvidia
-        dialog --title "Archie installer" --menu "The installer has detected both Intel and Nvidia graphics! GPUs detected:\n\n`gpucheck`\n\nNote: As of right now the installer can't setup switchable graphics (I have no idea how to do that reliably and i have no way to test it currently), so if this screen appears and you're on a laptop, select either 'Use Intel graphics' or 'Manual configuration'" 60 70 4 1 "Use the Nvidia proprietaty driver" 2 "Use the Nvidia FOSS driver (Nouveau)" 3 "Use Intel graphics" 4 "Manual configuration" 2> nvidiachoice.txt
+        dialog --no-canel --no-collapse --title "Archie installer" --menu "The installer has detected both Intel and Nvidia graphics! GPUs detected:\n\n`gpucheck`\n\nNote: As of right now the installer can't setup switchable graphics (I have no idea how to do that reliably and i have no way to test it currently), so if this screen appears and you're on a laptop, select either 'Use Intel graphics' or 'Manual configuration'" 60 70 4 1 "Use the Nvidia proprietaty driver" 2 "Use the Nvidia FOSS driver (Nouveau)" 3 "Use Intel graphics" 4 "Manual configuration" 2> nvidiachoice.txt
         nvidiachoice=$(cat nvidiachoice.txt)
         if [ $nvidiachoice == 1 ]; then     #Proprietary driver selected
             echo "NVIDIA Proprietary" > GPU.txt
@@ -117,7 +117,7 @@ if [ $? == 0 ]; then    #Check for Intel
 fi
 
 if [ $intel != 1 ] && [ $nvidia == 1 ]; then    #Check for Nvidia (Fuck you Nvidia)
-    dialog --title "Archie installer" --menu "The installer has detected Nvidia graphics! GPUs detected:\n\n`gpucheck`\n\nNote: If you're using an oler graphics cart (older than GTX 700 series), you'll wanna choose the 'Nvidia FOSS (Nouveau driver)'" 60 70 4 1 "Use the Nvidia proprietaty driver" 2 "Use the Nvidia FOSS driver (Nouveau)" 3. "Manual configuration"
+    dialog --no-canel --no-collapse --title "Archie installer" --menu "The installer has detected Nvidia graphics! GPUs detected:\n\n`gpucheck`\n\nNote: If you're using an oler graphics cart (older than GTX 700 series), you'll wanna choose the 'Nvidia FOSS (Nouveau driver)'" 60 70 4 1 "Use the Nvidia proprietaty driver" 2 "Use the Nvidia FOSS driver (Nouveau)" 3. "Manual configuration"
 fi
 
 
