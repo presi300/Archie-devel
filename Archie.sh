@@ -118,7 +118,7 @@ if [ $? == 0 ]; then    #Check for Intel
 fi
 
 if [ $intel != 1 ] && [ $nvidia == 1 ]; then    #Check for Nvidia (Fuck you Nvidia)
-    dialog --no-canel --no-collapse --title "Archie installer" --menu "The installer has detected Nvidia graphics! GPUs detected:\n\n`gpucheck`\n\nNote: If you're using an oler graphics cart (older than GTX 700 series), you'll wanna choose the 'Nvidia FOSS (Nouveau driver)'" 60 70 4 1 "Use the Nvidia proprietaty driver" 2 "Use the Nvidia FOSS driver (Nouveau)" 3. "Manual configuration"
+    dialog --no-canel --cr-wrap --title "Archie installer" --menu "The installer has detected Nvidia graphics! GPUs detected:\n\n`gpucheck`\n\nNote: If you're using an oler graphics cart (older than GTX 700 series), you'll wanna choose the 'Nvidia FOSS (Nouveau driver)'" 60 70 4 1 "Use the Nvidia proprietaty driver" 2 "Use the Nvidia FOSS driver (Nouveau)" 3. "Manual configuration"
 fi
 
 
