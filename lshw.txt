@@ -10,3 +10,4 @@
        capabilities: pm pciexpress msi vga_controller bus_master cap_list rom
        configuration: driver=amdgpu latency=0
        resources: irq:84 memory:d0000000-dfffffff memory:e0000000-e01fffff ioport:e000(size=256) memory:fca00000-fcafffff memory:fcb00000-fcb1ffff
+product: RTX 2070 mqwqqqqmqmqqqq

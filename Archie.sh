@@ -67,12 +67,12 @@ dialog --title "Wait..." --infobox "Detecting graphics adapter, please wait..." 
 lshw -numeric -C display &> lshw.txt    #Piping this command to a file because it's slow
 
 gpucheck(){     #I got tired of copy pasting this horrible line, so here's a function for it
-    cat lshw.txt | grep "product:" | sed -e 's/^\w*\ *//' | sed 's,/[^/]*$,,' | sed 's/[:[]//g' | sed 's/[]]//g' | sed 's/\<product\>//g'  | sed -e 's/^[ \t]*//' | column -t
+    cat lshw.txt | grep "product:" | sed -e 's/^\w*\ *//' | sed 's,/[^/]*$,,' | sed 's/[:[]//g' | sed 's/[]]//g' | sed 's/\<product\>//g'  | sed -e 's/^[ \t]*//' 
 } 
 
 cat lshw.txt | grep "AMD" &> installLog.log   #Check for AMD
 if [ $? == 0 ]; then
-    dialog --yes-label "Automatic" --no-label "Manual" --no-collapse --title "Archie installer" --yesno "The installer has detected AMD graphics! GPUs detected:\n\n`gpucheck`\n\n\n\nDo you want to proceed with automatic setup or do you wanna configure it by yourself later?\n\nNote: Choosing to configure it by yourself will mean that the installer will NOT install any X display drivers" 20 75  #Regex is my passion (idfk how sed works, i just throw stuff at it untill it works)
+    dialog --yes-label "Automatic" --no-label "Manual" --title "Archie installer" --yesno "The installer has detected AMD graphics! GPUs detected:\n\n`gpucheck`\n\n\n\nDo you want to proceed with automatic setup or do you wanna configure it by yourself later?\n\nNote: Choosing to configure it by yourself will mean that the installer will NOT install any X display drivers" 20 75  #Regex is my passion (idfk how sed works, i just throw stuff at it untill it works)
     if [ $? == 0 ]; then
         echo " xf86-video-amdgpu " >> packages.inst
         echo "AMD" > GPU.txt
