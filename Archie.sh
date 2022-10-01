@@ -67,7 +67,7 @@ dialog --title "Wait..." --infobox "Detecting graphics adapter, please wait..." 
 lshw -numeric -C display &> lshw.txt    #Piping this command to a file because it's slow
 
 gpucheck(){     #I got tired of copy pasting this horrible line, so here's a function for it
-    cat lshw.txt  | grep "product:" | sed -e 's/^\w*\ *//' | sed 's,/[^/]*$,,' | sed 's/[:[]//g' | sed 's/[]]//g' | sed 's/\<product\>//g'  | sed -e 's/^[ \t]*//'
+    cat lshw.txt | grep "product:" | sed -e 's/^\w*\ *//' | sed 's,/[^/]*$,,' | sed 's/[:[]//g' | sed 's/[]]//g' | sed 's/\<product\>//g'  | sed -e 's/^[ \t]*//' | column -t
 } 
 
 cat lshw.txt | grep "AMD" &> installLog.log   #Check for AMD
