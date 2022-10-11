@@ -79,34 +79,36 @@ if [ $? == 0 ]; then
     else [ $? != 0 ]
         echo "Manual" > GPU.txt
     fi
-fi
+fi  
 
 cat lshw.txt | grep "NVIDIA" &> installLog.log   #Check for NVIDIA (Fuck you, Nvidia)
 if [ $? == 0 ]; then
     nvidia=$(echo 1)
     echo NVIDIA >> GPU.txt
+else 
+    nvidia=$(echo 0)
 fi
 
 cat lshw.txt | grep "Intel" &> installLog.log
 if [ $? == 0 ]; then    #Check for Intel
-    intel=$(echo 1)
+    intel=$(echo "1")
     echo "Intel" >> GPU.txt
-    if [ $nvidia == 1 ]; then   #Check for both intel and nvidia
+    if [ $nvidia == "1" ]; then   #Check for both intel and nvidia
         dialog --no-cancel --cr-wrap --title "Archie installer" --menu "The installer has detected both Intel and Nvidia graphics! GPUs detected:\n\n`gpucheck`\n\nNote: As of right now the installer can't setup switchable graphics (I have no idea how to do that reliably and i have no way to test it currently), so if this screen appears and you're on a laptop, select either 'Use Intel graphics' or 'Manual configuration'" 50 55 4 1 "Use the Nvidia proprietaty driver" 2 "Use the Nvidia FOSS driver (Nouveau)" 3 "Use Intel graphics" 4 "Manual configuration" 2> nvidiachoice.txt
         nvidiachoice=$(cat nvidiachoice.txt)
-        if [ $nvidiachoice == 1 ]; then     #Proprietary driver selected
+        if [ $nvidiachoice == "1" ]; then     #Proprietary driver selected
             echo "NVIDIA Proprietary" > GPU.txt
             echo " nvidia nvidia-settings " >> packages.inst
-        elif [ $nvidiachoice == 2 ]; then   #Nouveau selected
+        elif [ $nvidiachoice == "2" ]; then   #Nouveau selected
             echo "NVIDIA FOSS" > GPU.txt
             echo " xf86-video-nouveau " >> packages.inst    #Intel selected
-        elif [ $nvidiachoice == 3 ]; then
+        elif [ $nvidiachoice == "3" ]; then
             echo "Intel" > GPU.txt
             echo " xf86-video-intel " >> packages.inst      #Manual configuration selected
-        elif [ $nvidiachoice == 4 ]; then
+        elif [ $nvidiachoice == "4" ]; then
             echo "Manual" > GPU.txt
         fi
-    elif [ $nvidia != 1 ]; then
+    elif [ $nvidia != "1" ]; then
         dialog --yes-label "Automatic" --no-label "Manual" --title "Archie installer" --yesno "The installer has detected Intel graphics! GPUs detected:\n\n`gpucheck`\n\n\n\nDo you want to proceed with automatic setup or do you wanna configure it by yourself later?\n\nNote: Choosing to configure it by yourself will mean that the installer will NOT install any X display drivers" 20 75
         if [ $? == 0 ]; then
             echo "Intel" > GPU.txt
@@ -116,6 +118,7 @@ if [ $? == 0 ]; then    #Check for Intel
         fi
     fi
 fi
+
 
 if [ $intel != 1 ] && [ $nvidia == 1 ]; then    #Check for Nvidia (Fuck you Nvidia)
     dialog --no-canel --cr-wrap --title "Archie installer" --menu "The installer has detected Nvidia graphics! GPUs detected:\n\n`gpucheck`\n\nNote: If you're using an oler graphics cart (older than GTX 700 series), you'll wanna choose the 'Nvidia FOSS (Nouveau driver)'" 60 70 4 1 "Use the Nvidia proprietaty driver" 2 "Use the Nvidia FOSS driver (Nouveau)" 3. "Manual configuration"
@@ -127,15 +130,27 @@ fi
 dialog --title "Archie installer" --menu "Select an installation profile" 10 40 5 1 "Desktop" 2 "Minimal" 2> profile.txt
 if [ "`cat profile.txt`" == 1 ]; then #Desktop profile
     dialog --title "Archie installer" --menu "Choose a desktop environment" 15 40 10 1 "KDE Plasma" 2 "Gnome" 3 "XFCE" 4 "Qtile" 2> DE.txt
-    if [ "`cat DE.txt`" == 1 ]; then
-        cat " plasma xorg sddm grub networkmanager neofetch sudo htop nvim dolphin gwenview spectacle konsole ark unzip p7zip "
+    if [ "`cat DE.txt`" == 1 ]; then #Plasma 1
+        echo " plasma xorg sddm networkmanager neofetch sudo htop nvim dolphin gwenview spectacle konsole ark unzip p7zip " >> packages.inst
+    elif [ "`cat DE.txt`" == 2 ]; then #Gnome 2
+        echo " gnome gdm xorg networkmanager neofetch sudo htop uzip p7zip nvim " >> packages.inst
+    elif [ "`cat DE.txt`" == 3 ]; then #XFCE 3
+        echo " xfce4 xfce4-goodies networkmanager sudo htop unzip p7zip nvim xorg lightdm neofetch " >> packages.inst
+    elif [ "`cat DE.txt`" == 4 ]; then #Qtile 4
+        dialog --title "Archie installer" --msgbox "Qtile is a tiling window manager. \n\nThis installer will pre-configure it with most necessary things for a fully functional desktop!" 10 50
+        echo " qtile networkmanager unzip p7zip nvim xorg neofetch " >> packages.inst #Things like the login manager are installed later on with this one
     fi
 fi
 if [ "`cat profile.txt`" == 2 ]; then #Minimal profile
     dialog --title "Archie installer" --msgbox "You have chosen to have a minimal installation!\n\nNote: This will not install X or any sort of sound system, just the bare minimum to get a functional system!" 20 70
-    echo " grub networkmanager neofetch sudo htop nvim " >> packages.inst
+    echo " networkmanager neofetch sudo htop nvim " >> packages.inst
 fi
 
+#Select kernel is no nvidia... idk how to setup dkms :)
+
+if [ $nvidia != 1 ]; then
+    dialog --title "Archie installer" --menu "Select a kernel" 13 40 4 1 "Linux (Recommended)" 2 "Linux-zen" 3 "Linux-lts" 4 "Linux-hardened"
+fi
 
 
 #Select Disk
